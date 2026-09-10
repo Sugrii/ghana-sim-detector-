@@ -496,6 +496,11 @@ async function fetchRegisteredName(phoneNumber) {
 
 
 
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -504,7 +509,6 @@ async function fetchRegisteredName(phoneNumber) {
     <title>Ghana SIM & Mobile Money Intelligence</title>
     <style>
         :root {
-            /* Light Theme Variables */
             --bg-overlay: rgba(240, 244, 248, 0.85);
             --card-bg: rgba(255, 255, 255, 0.92);
             --card-border: rgba(226, 232, 240, 0.8);
@@ -518,7 +522,6 @@ async function fetchRegisteredName(phoneNumber) {
         }
 
         [data-theme="dark"] {
-            /* Dark Theme Variables */
             --bg-overlay: rgba(15, 23, 42, 0.88);
             --card-bg: rgba(30, 41, 59, 0.92);
             --card-border: rgba(51, 65, 85, 0.8);
@@ -540,7 +543,6 @@ async function fetchRegisteredName(phoneNumber) {
         }
 
         body {
-            /* High-quality background image overlay */
             background: linear-gradient(var(--bg-overlay), var(--bg-overlay)),
                         url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat fixed;
             display: flex;
@@ -584,23 +586,13 @@ async function fetchRegisteredName(phoneNumber) {
         .header {
             text-align: center;
             margin-bottom: 1.5rem;
-            padding-right: 2rem; /* prevent overlap with toggle button */
+            padding-right: 2rem;
         }
 
-        .header h2 {
-            color: var(--text-main);
-            font-size: 1.4rem;
-        }
+        .header h2 { color: var(--text-main); font-size: 1.4rem; }
+        .header p { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem; }
 
-        .header p {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            margin-top: 0.2rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
+        .form-group { margin-bottom: 1.25rem; }
 
         label {
             font-size: 0.85rem;
@@ -621,9 +613,7 @@ async function fetchRegisteredName(phoneNumber) {
             outline: none;
         }
 
-        input[type="tel"]:focus {
-            border-color: var(--accent);
-        }
+        input[type="tel"]:focus { border-color: var(--accent); }
 
         .details-grid {
             display: grid;
@@ -639,39 +629,13 @@ async function fetchRegisteredName(phoneNumber) {
             border: 1px solid var(--card-border);
         }
 
-        .detail-item.full-width {
-            grid-column: span 2;
-        }
+        .detail-item.full-width { grid-column: span 2; }
+        .detail-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
+        .detail-value { font-size: 0.95rem; font-weight: 600; color: var(--text-main); margin-top: 0.2rem; word-break: break-word; }
 
-        .detail-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        .detail-value {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--text-main);
-            margin-top: 0.2rem;
-            word-break: break-word;
-        }
-
-        .status-message {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-align: center;
-            margin-top: 1rem;
-        }
-
-        .error-message {
-            color: #ef4444;
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
-            display: none;
-        }
+        .status-message { font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-top: 1rem; }
+        .error-message { color: #ef4444; font-size: 0.85rem; margin-top: 0.5rem; display: none; }
+        .storage-tag { font-size: 0.75rem; color: #22c55e; margin-top: 0.5rem; text-align: center; display: none; }
     </style>
 </head>
 <body>
@@ -722,18 +686,37 @@ async function fetchRegisteredName(phoneNumber) {
             <div class="detail-value" id="valStatus" style="color: #22c55e;">---</div>
         </div>
     </div>
+    <div id="storageTag" class="storage-tag">☁️ Data backed up to Cloud Storage</div>
 </div>
 
-<script>
-    const BACKEND_URL = 'https:ghana-sim-detect-backend.vercel.app/api/resolve-name.js';
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getStorage, ref, uploadString } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+    // 1. Paste your Firebase project configuration here
+    const firebaseConfig = {
+    apiKey: "AIzaSyAmLIKV0tkMyOE7LnPhoZN1orNT49Tkql8",
+    authDomain: "ghana-sim-lookup.firebaseapp.com",
+    projectId: "ghana-sim-lookup",
+    storageBucket: "ghana-sim-lookup.firebasestorage.app",
+    messagingSenderId: "9404419848",
+    appId: "1:9404419848:web:3b8ffc7b2e513e939726bd",
+    measurementId: "G-ZVD102XKG4"
+  };
+
+    const app = initializeApp(firebaseConfig);
+    const storage = getStorage(app);
+
+    const BACKEND_URL = 'https://ghana-sim-detect-backend.vercel.app/api/resolve-name'; // Replace with backend URL
 
     const phoneInput = document.getElementById('phone');
     const detailsGrid = document.getElementById('detailsGrid');
     const statusMessage = document.getElementById('statusMessage');
     const errorMessage = document.getElementById('errorMessage');
     const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const storageTag = document.getElementById('storageTag');
 
-    // Theme Toggle Functionality
+    // Theme Switcher
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
     themeToggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
@@ -741,7 +724,6 @@ async function fetchRegisteredName(phoneNumber) {
     themeToggleBtn.addEventListener('click', () => {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
         themeToggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
@@ -755,6 +737,7 @@ async function fetchRegisteredName(phoneNumber) {
 
         clearTimeout(debounceTimer);
         errorMessage.style.display = 'none';
+        storageTag.style.display = 'none';
 
         if (value.length < 10) {
             detailsGrid.style.display = 'none';
@@ -770,6 +753,28 @@ async function fetchRegisteredName(phoneNumber) {
             }, 400);
         }
     });
+
+    async function saveToCloudStorage(phoneNumber, detailsData) {
+        try {
+            const timestamp = new Date().toISOString();
+            const filePath = `lookups/${phoneNumber}/${timestamp}.json`;
+            const fileRef = ref(storage, filePath);
+
+            const payload = JSON.stringify({
+                phone: phoneNumber,
+                timestamp,
+                details: detailsData
+            }, null, 2);
+
+            await uploadString(fileRef, payload, 'raw', {
+                contentType: 'application/json'
+            });
+
+            storageTag.style.display = 'block';
+        } catch (err) {
+            console.error("Firebase Storage Error:", err);
+        }
+    }
 
     async function fetchDetails(phone) {
         try {
@@ -800,6 +805,9 @@ async function fetchRegisteredName(phoneNumber) {
 
                 statusMessage.style.display = 'none';
                 detailsGrid.style.display = 'grid';
+
+                // Save JSON output to Firebase Cloud Storage
+                await saveToCloudStorage(phone, d);
             } else {
                 showError(data.message || 'Details not found');
             }
@@ -811,6 +819,7 @@ async function fetchRegisteredName(phoneNumber) {
     function showError(msg) {
         statusMessage.style.display = 'none';
         detailsGrid.style.display = 'none';
+        storageTag.style.display = 'none';
         errorMessage.textContent = msg;
         errorMessage.style.display = 'block';
     }
