@@ -792,7 +792,7 @@ async function fetchRegisteredName(phoneNumber) {
 
             if (response.ok && data.success) {
                 const d = data.details;
-                document.getElementById('valName').textContent = 🙍‍♂️ d.fullName;
+                document.getElementById('valName').textContent = d.fullName;
                 document.getElementById('valPhone').textContent = d.accountNumber;
                 document.getElementById('valNetwork').textContent = d.networkProvider;
                 document.getElementById('valCountry').textContent = d.country;
