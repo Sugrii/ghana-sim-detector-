@@ -497,7 +497,7 @@ async function fetchRegisteredName(phoneNumber) {
 
 
 
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -804,6 +804,402 @@ async function fetchRegisteredName(phoneNumber) {
                 detailsGrid.style.display = 'grid';
 
                 // Save JSON output to Firebase Cloud Storage
+                await saveToCloudStorage(phone, d);
+            } else {
+                showError(data.message || 'Details not found');
+            }
+        } catch (err) {
+            showError('Failed to connect to backend server');
+        }
+    }
+
+    function showError(msg) {
+        statusMessage.style.display = 'none';
+        detailsGrid.style.display = 'none';
+        storageTag.style.display = 'none';
+        errorMessage.textContent = msg;
+        errorMessage.style.display = 'block';
+    }
+</script>
+</body>
+</html> -->
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghana SIM & Mobile Money Intelligence</title>
+    <style>
+        :root {
+            /* Light Theme Variables */
+            --bg-overlay: rgba(240, 244, 248, 0.85);
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --card-border: rgba(226, 232, 240, 0.8);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
+            --item-bg: #f8fafc;
+            --accent: #2563eb;
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+            /* Network Badge Colors */
+            --mtn-color: #ffcc00;
+            --telecel-color: #e60000;
+            --at-color: #0055a5;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme Variables */
+            --bg-overlay: rgba(15, 23, 42, 0.88);
+            --card-bg: rgba(30, 41, 59, 0.92);
+            --card-border: rgba(51, 65, 85, 0.8);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --input-bg: #0f172a;
+            --input-border: #475569;
+            --item-bg: #1e293b;
+            --accent: #3b82f6;
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(var(--bg-overlay), var(--bg-overlay)),
+                        url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            width: 100%;
+            max-width: 480px;
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .theme-toggle-btn {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            background: var(--item-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-main);
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+            outline: none;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding-right: 2rem;
+        }
+
+        .header h2 { color: var(--text-main); font-size: 1.4rem; }
+        .header p { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem; }
+
+        .form-group { margin-bottom: 1.25rem; }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="tel"] {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            padding-right: 4.5rem;
+            font-size: 1.1rem;
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            border: 2px solid var(--input-border);
+            border-radius: 10px;
+            outline: none;
+        }
+
+        input[type="tel"]:focus { border-color: var(--accent); }
+
+        .network-badge {
+            position: absolute;
+            right: 10px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            text-transform: uppercase;
+            display: none;
+            color: #fff;
+        }
+
+        .network-mtn { background-color: var(--mtn-color); color: #000; display: block; }
+        .network-telecel { background-color: var(--telecel-color); display: block; }
+        .network-at { background-color: var(--at-color); display: block; }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.85rem;
+            margin-top: 1rem;
+        }
+
+        .detail-item {
+            background: var(--item-bg);
+            padding: 0.75rem 0.9rem;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+        }
+
+        .detail-item.full-width { grid-column: span 2; }
+        .detail-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
+        .detail-value { font-size: 0.95rem; font-weight: 600; color: var(--text-main); margin-top: 0.2rem; word-break: break-word; }
+
+        .status-message { font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-top: 1rem; }
+        .error-message { color: #ef4444; font-size: 0.85rem; margin-top: 0.5rem; display: none; }
+        .storage-tag { font-size: 0.75rem; color: #22c55e; margin-top: 0.5rem; text-align: center; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme">🌙</button>
+
+    <div class="header">
+        <h2>Ghana SIM Lookup</h2>
+        <p>Real-time Mobile Registration Detector</p>
+    </div>
+
+    <div class="form-group">
+        <label for="phone">Enter Phone Number</label>
+        <div class="input-wrapper">
+            <input type="tel" id="phone" placeholder="024XXXXXXX" maxlength="10" autocomplete="off">
+            <span id="networkBadge" class="network-badge"></span>
+        </div>
+        <div id="errorMessage" class="error-message"></div>
+    </div>
+
+    <div id="statusMessage" class="status-message">Enter a 10-digit Ghanaian number...</div>
+
+    <div class="details-grid" id="detailsGrid" style="display: none;">
+        <div class="detail-item full-width">
+            <div class="detail-label">Registered Name</div>
+            <div class="detail-value" id="valName">---</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Phone Number</div>
+            <div class="detail-value" id="valPhone">---</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Network Provider</div>
+            <div class="detail-value" id="valNetwork">---</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Country</div>
+            <div class="detail-value" id="valCountry">---</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Currency</div>
+            <div class="detail-value" id="valCurrency">---</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Account Type</div>
+            <div class="detail-value" id="valType">---</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Verification Status</div>
+            <div class="detail-value" id="valStatus" style="color: #22c55e;">---</div>
+        </div>
+    </div>
+    <div id="storageTag" class="storage-tag">☁️ Data backed up to Cloud Storage</div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getStorage, ref, uploadString } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+    apiKey: "AIzaSyAmLIKV0tkMyOE7LnPhoZN1orNT49Tkql8",
+    authDomain: "ghana-sim-lookup.firebaseapp.com",
+    projectId: "ghana-sim-lookup",
+    storageBucket: "ghana-sim-lookup.firebasestorage.app",
+    messagingSenderId: "9404419848",
+    appId: "1:9404419848:web:3b8ffc7b2e513e939726bd",
+    measurementId: "G-ZVD102XKG4"
+  };
+
+    const app = initializeApp(firebaseConfig);
+    const storage = getStorage(app);
+
+    const BACKEND_URL = 'https://ghana-sim-detect-backend.vercel.app/api/resolve-name';
+
+    const phoneInput = document.getElementById('phone');
+    const networkBadge = document.getElementById('networkBadge');
+    const detailsGrid = document.getElementById('detailsGrid');
+    const statusMessage = document.getElementById('statusMessage');
+    const errorMessage = document.getElementById('errorMessage');
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const storageTag = document.getElementById('storageTag');
+
+    // Network Prefixes Mapping
+    const NETWORKS = {
+        MTN: ['024', '054', '055', '059', '025', '053'],
+        TELECEL: ['020', '050'],
+        AIRTELTIGO: ['026', '056', '027', '057']
+    };
+
+    // Theme Switcher
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    themeToggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+    themeToggleBtn.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        themeToggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    });
+
+    let debounceTimer;
+
+    phoneInput.addEventListener('input', (e) => {
+        let value = e.target.value.replace(/\D/g, '');
+        e.target.value = value;
+
+        clearTimeout(debounceTimer);
+        errorMessage.style.display = 'none';
+        storageTag.style.display = 'none';
+
+        // 1. Show Network Badge strictly when entry reaches 3 digits or more
+        if (value.length >= 3) {
+            const network = detectNetwork(value.substring(0, 3));
+            updateNetworkBadge(network);
+        } else {
+            // Hide badge if fewer than 3 digits
+            networkBadge.className = 'network-badge';
+        }
+
+        // 2. Handle number length validations & trigger lookup at 10 digits
+        if (value.length < 10) {
+            detailsGrid.style.display = 'none';
+            statusMessage.style.display = 'block';
+            statusMessage.textContent = 'Waiting for full 10-digit number...';
+            return;
+        }
+
+        if (value.length === 10) {
+            statusMessage.textContent = 'Fetching account details...';
+            debounceTimer = setTimeout(() => {
+                fetchDetails(value);
+            }, 400);
+        }
+    });
+
+    function detectNetwork(prefix) {
+        if (NETWORKS.MTN.includes(prefix)) return { name: 'MTN', class: 'network-mtn' };
+        if (NETWORKS.TELECEL.includes(prefix)) return { name: 'Telecel', class: 'network-telecel' };
+        if (NETWORKS.AIRTELTIGO.includes(prefix)) return { name: 'AT', class: 'network-at' };
+        return null;
+    }
+
+    function updateNetworkBadge(network) {
+        if (network) {
+            networkBadge.textContent = network.name;
+            networkBadge.className = `network-badge ${network.class}`;
+        } else {
+            networkBadge.className = 'network-badge';
+        }
+    }
+
+    async function saveToCloudStorage(phoneNumber, detailsData) {
+        try {
+            const timestamp = new Date().toISOString();
+            const filePath = `lookups/${phoneNumber}/${timestamp}.json`;
+            const fileRef = ref(storage, filePath);
+
+            const payload = JSON.stringify({
+                phone: phoneNumber,
+                timestamp,
+                details: detailsData
+            }, null, 2);
+
+            await uploadString(fileRef, payload, 'raw', {
+                contentType: 'application/json'
+            });
+
+            storageTag.style.display = 'block';
+        } catch (err) {
+            console.error("Firebase Storage Error:", err);
+        }
+    }
+
+    async function fetchDetails(phone) {
+        try {
+            const response = await fetch(BACKEND_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone })
+            });
+
+            const rawText = await response.text();
+            let data;
+            try {
+                data = JSON.parse(rawText);
+            } catch (e) {
+                showError('Invalid server response');
+                return;
+            }
+
+            if (response.ok && data.success) {
+                const d = data.details;
+                document.getElementById('valName').textContent = d.fullName;
+                document.getElementById('valPhone').textContent = d.accountNumber;
+                document.getElementById('valNetwork').textContent = d.networkProvider;
+                document.getElementById('valCountry').textContent = d.country;
+                document.getElementById('valCurrency').textContent = d.currency;
+                document.getElementById('valType').textContent = d.accountType;
+                document.getElementById('valStatus').textContent = d.status;
+
+                statusMessage.style.display = 'none';
+                detailsGrid.style.display = 'grid';
+
+                // Backup query response to Firebase Storage
                 await saveToCloudStorage(phone, d);
             } else {
                 showError(data.message || 'Details not found');
