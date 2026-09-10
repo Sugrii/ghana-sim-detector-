@@ -877,7 +877,7 @@ async function fetchRegisteredName(phoneNumber) {
 
         body {
             background: linear-gradient(var(--bg-overlay), var(--bg-overlay)),
-                        url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat fixed;
+                        url('Untitled design.png') center/cover no-repeat fixed;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -1017,31 +1017,31 @@ async function fetchRegisteredName(phoneNumber) {
 
     <div class="details-grid" id="detailsGrid" style="display: none;">
         <div class="detail-item full-width">
-            <div class="detail-label">Registered Name</div>
+            <div class="detail-label">🙎‍♂️ Registered Name</div>
             <div class="detail-value" id="valName">---</div>
         </div>
         <div class="detail-item">
-            <div class="detail-label">Phone Number</div>
+            <div class="detail-label">📞 Phone Number</div>
             <div class="detail-value" id="valPhone">---</div>
         </div>
         <div class="detail-item">
-            <div class="detail-label">Network Provider</div>
+            <div class="detail-label">📶 Network Provider</div>
             <div class="detail-value" id="valNetwork">---</div>
         </div>
         <div class="detail-item">
-            <div class="detail-label">Country</div>
+            <div class="detail-label">🇬🇭 Country</div>
             <div class="detail-value" id="valCountry">---</div>
         </div>
         <div class="detail-item">
-            <div class="detail-label">Currency</div>
+            <div class="detail-label">💵 Currency</div>
             <div class="detail-value" id="valCurrency">---</div>
         </div>
         <div class="detail-item">
-            <div class="detail-label">Account Type</div>
+            <div class="detail-label">Ⓜ️ Account Type</div>
             <div class="detail-value" id="valType">---</div>
         </div>
         <div class="detail-item">
-            <div class="detail-label">Verification Status</div>
+            <div class="detail-label">✅ Verification Status</div>
             <div class="detail-value" id="valStatus" style="color: #22c55e;">---</div>
         </div>
     </div>
@@ -1124,7 +1124,7 @@ async function fetchRegisteredName(phoneNumber) {
         }
 
         if (value.length === 10) {
-            statusMessage.textContent = 'Fetching account details...';
+            statusMessage.textContent = 'Fetching account details wait...';
             debounceTimer = setTimeout(() => {
                 fetchDetails(value);
             }, 400);
